@@ -77,9 +77,19 @@ async function fetchEntryData(word, reading) {
   };
 }
 
-async function addNote(word, reading) {
-  const { deckName, modelName, fieldMappings } = await getSettings();
-  const entryData = await fetchEntryData(word, reading);
+async function addNote(word, reading, audioUrl) {
+  const [{ deckName, modelName, fieldMappings }, entryData] = await Promise.all([
+    getSettings(),
+    fetchEntryData(word, reading),
+  ]);
+
+  if (audioUrl && Object.values(fieldMappings).includes("audio")) {
+    const filename = audioUrl.split("/").pop();
+    await ankiConnectRequest("storeMediaFile", { filename, url: audioUrl });
+    entryData.audio = `[sound:${filename}]`;
+  } else {
+    entryData.audio = "";
+  }
 
   const fields = {};
   for (const [noteField, jishoField] of Object.entries(fieldMappings)) {
@@ -100,9 +110,9 @@ async function addNote(word, reading) {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type !== "MINE_WORD") return false;
 
-  const { word, reading } = message.payload;
+  const { word, reading, audioUrl } = message.payload;
 
-  addNote(word, reading)
+  addNote(word, reading, audioUrl)
     .then(() => sendResponse({ success: true }))
     .catch((err) => sendResponse({ success: false, error: err.message }));
 

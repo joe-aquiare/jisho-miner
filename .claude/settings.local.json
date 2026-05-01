@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:jisho.org)",
       "Bash(curl -s \"https://jisho.org/search/%E6%B0%B4\")",
-      "Bash(curl -s \"https://jisho.org/api/v1/search/words?keyword=%E3%81%8A%E3%81%A1%E3%82%83\")"
+      "Bash(curl -s \"https://jisho.org/api/v1/search/words?keyword=%E3%81%8A%E3%81%A1%E3%82%83\")",
+      "Bash(curl -s \"https://jisho.org/word/%E3%81%8A%E8%8C%B6\" -H \"User-Agent: Mozilla/5.0\")"
     ]
   }
 }

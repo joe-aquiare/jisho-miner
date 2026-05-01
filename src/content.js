@@ -9,16 +9,29 @@
 const MINE_BUTTON_CLASS = "jisho-miner-btn";
 
 function extractEntryData(entryEl) {
-  const word    = entryEl.querySelector(".text")?.textContent.trim() ?? "";
-  const reading = entryEl.querySelector(".furigana")?.textContent.trim().replace(/\s+/g, "") ?? "";
-  return { word, reading };
+  const audioEl  = entryEl.querySelector("audio[id^='audio_']");
+  const audioSrc = audioEl?.querySelector('source[type="audio/mpeg"]')?.getAttribute("src") ?? "";
+  const audioUrl = audioSrc ? `https:${audioSrc}` : "";
+
+  // The audio id encodes word and reading as "audio_WORD:READING", which is
+  // more reliable than parsing furigana spans for mixed kana/kanji entries
+  // (the furigana span only carries readings for kanji, not kana prefixes).
+  let word, reading;
+  if (audioEl?.id) {
+    [word = "", reading = ""] = audioEl.id.slice("audio_".length).split(":");
+  } else {
+    word    = entryEl.querySelector(".text")?.textContent.trim() ?? "";
+    reading = entryEl.querySelector(".furigana")?.textContent.trim().replace(/\s+/g, "") ?? "";
+  }
+
+  return { word, reading, audioUrl };
 }
 
 function createMineButton(entryEl) {
   const btn = document.createElement("button");
   btn.className = MINE_BUTTON_CLASS;
-  btn.textContent = "Mine";
-  btn.title = "Add to Anki mining deck";
+  btn.textContent = "+ Add to Anki";
+  btn.title = "Add to Anki Mining Deck";
 
   btn.addEventListener("click", async (e) => {
     e.preventDefault();

@@ -14,6 +14,7 @@ const JISHO_FIELDS = [
   { value: "jlptLevel",     label: "JLPT Level" },
   { value: "commonWord",    label: "Common Word" },
   { value: "wanikaniLevel", label: "WaniKani Level" },
+  { value: "audio",         label: "Audio" },
   { value: "webUrl",        label: "Web URL" },
   { value: "apiUrl",        label: "API URL" },
   { value: "partsOfSpeech", label: "Parts of Speech" },
