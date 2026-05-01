@@ -27,11 +27,26 @@ function extractEntryData(entryEl) {
   return { word, reading, audioUrl };
 }
 
+function markAsAdded(btn) {
+  btn.textContent = "✓ In Deck";
+  btn.disabled = true;
+  btn.classList.add("jisho-miner-btn--added");
+  btn.classList.remove("jisho-miner-btn--error");
+}
+
 function createMineButton(entryEl) {
   const btn = document.createElement("button");
   btn.className = MINE_BUTTON_CLASS;
   btn.textContent = "+ Add to Anki";
   btn.title = "Add to Anki Mining Deck";
+
+  // Silently check on load whether this word is already in the deck.
+  const { word, reading } = extractEntryData(entryEl);
+  if (word) {
+    chrome.runtime.sendMessage({ type: "CHECK_WORD", payload: { word, reading } })
+      .then(response => { if (response?.exists) markAsAdded(btn); })
+      .catch(() => {});
+  }
 
   btn.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -49,8 +64,7 @@ function createMineButton(entryEl) {
     });
 
     if (response?.success) {
-      btn.textContent = "✓";
-      btn.classList.add("jisho-miner-btn--added");
+      markAsAdded(btn);
     } else {
       btn.textContent = "✗";
       btn.classList.add("jisho-miner-btn--error");

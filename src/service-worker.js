@@ -107,14 +107,38 @@ async function addNote(word, reading, audioUrl) {
   });
 }
 
+async function checkNote(word, reading) {
+  const { deckName, fieldMappings } = await getSettings();
+
+  // Find the first note field mapped to "word", falling back to "reading"
+  const [searchField, searchValue] =
+    Object.entries(fieldMappings).find(([, v]) => v === "word")
+      ? [Object.entries(fieldMappings).find(([, v]) => v === "word")[0], word]
+      : Object.entries(fieldMappings).find(([, v]) => v === "reading")
+      ? [Object.entries(fieldMappings).find(([, v]) => v === "reading")[0], reading]
+      : [null, null];
+
+  if (!searchField || !searchValue) return false;
+
+  const query = `deck:"${deckName}" "${searchField}:${searchValue}"`;
+  const noteIds = await ankiConnectRequest("findNotes", { query });
+  return noteIds.length > 0;
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type !== "MINE_WORD") return false;
+  if (message.type === "MINE_WORD") {
+    const { word, reading, audioUrl } = message.payload;
+    addNote(word, reading, audioUrl)
+      .then(() => sendResponse({ success: true }))
+      .catch((err) => sendResponse({ success: false, error: err.message }));
+    return true;
+  }
 
-  const { word, reading, audioUrl } = message.payload;
-
-  addNote(word, reading, audioUrl)
-    .then(() => sendResponse({ success: true }))
-    .catch((err) => sendResponse({ success: false, error: err.message }));
-
-  return true; // keep the message channel open for the async response
+  if (message.type === "CHECK_WORD") {
+    const { word, reading } = message.payload;
+    checkNote(word, reading)
+      .then(exists => sendResponse({ exists }))
+      .catch(() => sendResponse({ exists: false }));
+    return true;
+  }
 });
