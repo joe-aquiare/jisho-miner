@@ -1,0 +1,31 @@
+.jisho-miner-btn {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-family: sans-serif;
+  font-weight: 600;
+  color: #fff;
+  background-color: #4a90d9;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background-color 0.15s ease;
+}
+
+.jisho-miner-btn:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.jisho-miner-btn:disabled {
+  cursor: default;
+}
+
+.jisho-miner-btn--added {
+  background-color: #4caf50;
+}
+
+.jisho-miner-btn--error {
+  background-color: #e53935;
+}

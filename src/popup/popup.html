@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jisho Miner Settings</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <h1>Jisho Miner</h1>
+
+    <div id="error-banner" hidden>
+      ⚠ Could not reach AnkiConnect. Make sure Anki is open and the
+      AnkiConnect add-on is installed, then reopen this popup.
+    </div>
+
+    <form id="settings-form">
+      <label for="deck-name">Deck</label>
+      <select id="deck-name" name="deckName"></select>
+
+      <label for="model-name">Note type</label>
+      <select id="model-name" name="modelName"></select>
+
+      <hr />
+
+      <div id="field-mappings"></div>
+    </form>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
