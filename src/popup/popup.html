@@ -7,34 +7,46 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h1>
-      <img src="../../icons/icon128.png" alt="" class="header-icon" />
-      <span>
-        Jisho Miner
-        <span id="version"></span>
-      </span>
-    </h1>
+    <div id="sticky-header">
+      <h1>
+        <img src="../../icons/icon128.png" alt="" class="header-icon" />
+        <span>
+          Jisho Miner
+          <span id="version"></span>
+        </span>
+      </h1>
 
-    <div id="error-banner" hidden>
-      ⚠ Could not reach AnkiConnect. Make sure Anki is open and the
-      AnkiConnect add-on is installed, then reopen this popup.
-    </div>
+      <div id="error-banner" hidden>
+        ⚠ Could not reach AnkiConnect. Make sure Anki is open and the
+        <a href="https://ankiweb.net/shared/info/2055492159">AnkiConnect add-on</a> is installed, then try again.
+      </div>
 
-    <form id="settings-form">
       <label for="deck-name">Deck</label>
       <select id="deck-name" name="deckName"></select>
 
       <label for="model-name">Note Type</label>
       <select id="model-name" name="modelName"></select>
+    </div>
 
-      <hr />
-
-      <div id="fields-title">Note Fields</div>
-
+    <form id="settings-form">
+      <div id="fields-title">Note Type Fields</div>
       <div id="field-mappings"></div>
-
-      <button type="submit" id="save-btn">Save</button>
     </form>
+
+    <div id="footer">
+      <button type="submit" form="settings-form" id="save-btn">Save</button>
+      <div id="credits">
+        <div class="credit">
+          <a href="https://joeaquiare.site" target="_blank">My Website</a>
+        </div>
+        <div class="credit">
+          <a href="https://www.paypal.com/donate/?hosted_button_id=8NTL4DSEQJHH6" target="_blank">Donate!</a>
+        </div>
+        <div class="credit">
+          <a href="" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </div>
 
     <script src="popup.js"></script>
   </body>

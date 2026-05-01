@@ -184,18 +184,6 @@ async function init() {
     });
   } catch {
     document.getElementById("error-banner").hidden = false;
-
-    populateSelect(document.getElementById("deck-name"), [settings.deckName], settings.deckName);
-    populateSelect(document.getElementById("model-name"), [settings.modelName], settings.modelName);
-
-    const savedMappings = settings.fieldMappings ?? {};
-    const savedNoteFields = Object.keys(savedMappings);
-    if (savedNoteFields.length > 0) {
-      renderFieldMappings(savedNoteFields, savedMappings);
-    } else {
-      document.getElementById("field-mappings").textContent =
-        "Start Anki to configure field mappings.";
-    }
   }
 }
 

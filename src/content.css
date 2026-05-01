@@ -15,7 +15,7 @@
   cursor: pointer;
   vertical-align: middle;
   transition: background-position 0.05s linear;
-  width: 64%;
+  width: 100px;
   height: 32px;
 }
 
@@ -37,16 +37,4 @@
   background-image: none;
   color: #000 !important;
   background-color: #e53935 !important;
-}
-
-@media (max-width: 1024px) {
-  .jisho-miner-btn {
-    width: 204px;
-  }
-}
-
-@media (max-width: 275px) {
-  .jisho-miner-btn {
-    width: 100px;
-  }
 }
