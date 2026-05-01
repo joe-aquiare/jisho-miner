@@ -7,19 +7,20 @@
   font-family: sans-serif;
   font-weight: 500;
   color: #eee !important;
-  background-color: #909dc0;
+  background-image: linear-gradient(to right, #909dc0 50%, #555555 50%);
+  background-size: 200% 100%;
+  background-position: right center;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   vertical-align: middle;
-  transition: background-color 0.15s ease;
+  transition: background-position 0.05s linear;
   width: 64%;
   height: 32px;
-  
 }
 
 .jisho-miner-btn:hover:not(:disabled) {
-  background-color: #909dc0;
+  background-position: left center;
 }
 
 .jisho-miner-btn:disabled {
@@ -27,11 +28,25 @@
 }
 
 .jisho-miner-btn--added {
+  background-image: none;
   color: #000 !important;
   background-color: #bbffb1 !important;
 }
 
 .jisho-miner-btn--error {
+  background-image: none;
   color: #000 !important;
   background-color: #e53935 !important;
+}
+
+@media (max-width: 1024px) {
+  .jisho-miner-btn {
+    width: 204px;
+  }
+}
+
+@media (max-width: 275px) {
+  .jisho-miner-btn {
+    width: 100px;
+  }
 }

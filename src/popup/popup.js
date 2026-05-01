@@ -8,9 +8,9 @@ const DEFAULTS = {
 
 const JISHO_FIELDS = [
   { value: "",              label: "(empty)" },
-  { value: "word",          label: "Word (日本語)" },
-  { value: "reading",       label: "Kana (日本語)" },
-  { value: "definition",    label: "Meaning (English)" },
+  { value: "word",          label: "Word" },
+  { value: "reading",       label: "Kana" },
+  { value: "definition",    label: "Meaning" },
   { value: "jlptLevel",     label: "JLPT Level" },
   { value: "commonWord",    label: "Common Word" },
   { value: "wanikaniLevel", label: "WaniKani Level" },
