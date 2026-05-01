@@ -1,3 +1,5 @@
+![Alt text](/icons/bannerFull.png)
+
 # jisho-miner
 
 A Chromium browser extension that adds a **Mine** button to every word entry on
