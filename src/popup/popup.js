@@ -142,12 +142,10 @@ function renderFieldMappings(noteFields, savedMappings) {
 
     customInput.addEventListener("input", () => {
       validateCustomInput(customInput, customError);
-      saveSettings();
     });
 
     select.addEventListener("change", () => {
       customWrapper.hidden = select.value !== "__custom__";
-      saveSettings();
     });
 
     container.appendChild(label);
@@ -181,11 +179,8 @@ async function init() {
 
     await loadFields(modelSelect.value, settings.fieldMappings);
 
-    deckSelect.addEventListener("change", saveSettings);
-
     modelSelect.addEventListener("change", async () => {
       await loadFields(modelSelect.value, {});
-      saveSettings();
     });
   } catch {
     document.getElementById("error-banner").hidden = false;
@@ -203,5 +198,18 @@ async function init() {
     }
   }
 }
+
+document.getElementById("settings-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  saveSettings();
+
+  const btn = document.getElementById("save-btn");
+  btn.textContent = "Saved!";
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = "Save";
+    btn.disabled = false;
+  }, 1500);
+});
 
 init();
