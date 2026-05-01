@@ -7,7 +7,8 @@ const DEFAULTS = {
 };
 
 const JISHO_FIELDS = [
-  { value: "",              label: "(empty)" },
+  { value: "",              label: "(Empty)" },
+  { value: "__custom__",    label: "{Custom}" },
   { value: "word",          label: "Word" },
   { value: "reading",       label: "Kana" },
   { value: "definition",    label: "Meaning" },
@@ -20,6 +21,16 @@ const JISHO_FIELDS = [
   { value: "partsOfSpeech", label: "Parts of Speech" },
   { value: "tags",          label: "Tags" },
 ];
+
+// Set of known stored values (everything except the UI-only "__custom__" sentinel).
+const KNOWN_JISHO_VALUES = new Set(
+  JISHO_FIELDS.filter(f => f.value !== "__custom__").map(f => f.value)
+);
+
+// Set of valid variable names usable inside {…} in a custom template.
+const VALID_JISHO_VARS = new Set(
+  JISHO_FIELDS.filter(f => f.value && f.value !== "__custom__").map(f => f.value)
+);
 
 async function ankiConnect(action, params = {}) {
   const res = await fetch(ANKICONNECT_URL, {
@@ -38,9 +49,18 @@ function getSettings() {
 }
 
 function saveSettings() {
+  // Build noteField → custom template map from any visible custom inputs first.
+  const customValues = {};
+  document.querySelectorAll("#field-mappings .custom-field-input").forEach((input) => {
+    customValues[input.dataset.noteField] = input.value;
+  });
+
   const fieldMappings = {};
-  document.querySelectorAll("#field-mappings select").forEach((sel) => {
-    fieldMappings[sel.dataset.noteField] = sel.value;
+  document.querySelectorAll("#field-mappings select[data-note-field]").forEach((sel) => {
+    const noteField = sel.dataset.noteField;
+    fieldMappings[noteField] = sel.value === "__custom__"
+      ? (customValues[noteField] ?? "")
+      : sel.value;
   });
 
   chrome.storage.sync.set({
@@ -61,6 +81,13 @@ function populateSelect(selectEl, items, savedValue) {
   selectEl.value = items.includes(savedValue) ? savedValue : (items[0] ?? "");
 }
 
+function validateCustomInput(input, errorEl) {
+  const matches = [...input.value.matchAll(/\{(\w+)\}/g)];
+  const hasInvalid = matches.some(m => !VALID_JISHO_VARS.has(m[1]));
+  input.classList.toggle("custom-field-input--error", hasInvalid);
+  errorEl.hidden = !hasInvalid;
+}
+
 function renderFieldMappings(noteFields, savedMappings) {
   const container = document.getElementById("field-mappings");
   container.innerHTML = "";
@@ -71,26 +98,61 @@ function renderFieldMappings(noteFields, savedMappings) {
   }
 
   for (const noteField of noteFields) {
+    const savedValue = savedMappings[noteField] ?? "";
+    const isCustom = !KNOWN_JISHO_VALUES.has(savedValue);
+
+    // Label
     const label = document.createElement("label");
     label.textContent = noteField;
     label.htmlFor = `field-map-${noteField}`;
 
+    // Select
     const select = document.createElement("select");
     select.id = `field-map-${noteField}`;
     select.dataset.noteField = noteField;
-
     for (const { value, label: optLabel } of JISHO_FIELDS) {
       const opt = document.createElement("option");
       opt.value = value;
       opt.textContent = optLabel;
       select.appendChild(opt);
     }
+    select.value = isCustom ? "__custom__" : savedValue;
 
-    select.value = savedMappings[noteField] ?? "";
-    select.addEventListener("change", saveSettings);
+    // Custom template input (hidden unless "Custom" is selected)
+    const customWrapper = document.createElement("div");
+    customWrapper.className = "custom-field-wrapper";
+    customWrapper.hidden = !isCustom;
+
+    const customInput = document.createElement("input");
+    customInput.type = "text";
+    customInput.className = "custom-field-input";
+    customInput.dataset.noteField = noteField;
+    customInput.placeholder = "e.g. {word} (Common: {commonWord})";
+    customInput.value = isCustom ? savedValue : "";
+
+    const customError = document.createElement("span");
+    customError.className = "custom-field-error";
+    customError.textContent = "Error: Invalid variable name.";
+    customError.hidden = true;
+
+    customWrapper.appendChild(customInput);
+    customWrapper.appendChild(customError);
+
+    if (isCustom) validateCustomInput(customInput, customError);
+
+    customInput.addEventListener("input", () => {
+      validateCustomInput(customInput, customError);
+      saveSettings();
+    });
+
+    select.addEventListener("change", () => {
+      customWrapper.hidden = select.value !== "__custom__";
+      saveSettings();
+    });
 
     container.appendChild(label);
     container.appendChild(select);
+    container.appendChild(customWrapper);
   }
 }
 

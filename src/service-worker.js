@@ -93,7 +93,17 @@ async function addNote(word, reading, audioUrl) {
 
   const fields = {};
   for (const [noteField, jishoField] of Object.entries(fieldMappings)) {
-    fields[noteField] = jishoField ? (entryData[jishoField] ?? "") : "";
+    if (!jishoField) {
+      fields[noteField] = "";
+    } else if (Object.hasOwn(entryData, jishoField)) {
+      fields[noteField] = entryData[jishoField] ?? "";
+    } else {
+      // Custom template — replace {varName} placeholders with entry data
+      fields[noteField] = jishoField.replace(
+        /\{(\w+)\}/g,
+        (_, key) => entryData[key] ?? ""
+      );
+    }
   }
 
   return ankiConnectRequest("addNote", {

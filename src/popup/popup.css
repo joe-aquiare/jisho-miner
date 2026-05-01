@@ -75,3 +75,52 @@ hr {
   color: #616161;
 }
 
+.custom-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.custom-field-wrapper[hidden] {
+  display: none;
+}
+
+.custom-field-input {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.custom-field-input:focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+.custom-field-input--error {
+  border-color: #e53935;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
+}
+
+.custom-field-input--error:focus {
+  border-color: #e53935;
+  box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
+}
+
+.custom-field-error {
+  font-size: 10px;
+  color: #e53935;
+}
+
+.custom-field-vars {
+  align-self: flex-start;
+  font-size: 10px;
+  color: #9e9e9e;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
