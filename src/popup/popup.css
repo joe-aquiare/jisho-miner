@@ -26,6 +26,13 @@ h1 {
   flex-shrink: 0;
 }
 
+#version {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: #9e9e9e;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -148,7 +155,7 @@ hr {
   color: #222;
   border: none;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.15s ease;

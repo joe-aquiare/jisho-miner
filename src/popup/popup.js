@@ -212,4 +212,6 @@ document.getElementById("settings-form").addEventListener("submit", (e) => {
   }, 1500);
 });
 
+document.getElementById("version").textContent = `v${chrome.runtime.getManifest().version}`;
+
 init();
