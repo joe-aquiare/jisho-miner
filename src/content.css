@@ -28,9 +28,9 @@
 }
 
 .jisho-miner-btn--added {
-  background-image: none;
+  background-image: linear-gradient(to right, #909dc0 50%, #8abc83 50%);
   color: #000 !important;
-  background-color: #bbffb1 !important;
+  background-color:  !important;
 }
 
 .jisho-miner-btn--error {

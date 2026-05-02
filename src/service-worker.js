@@ -35,7 +35,7 @@ async function getSettings() {
   });
 }
 
-async function findEntry(word, reading) {
+async function findEntry(word, reading, slug = "", pageMeanings = []) {
   const url = `${JISHO_API_URL}?keyword=${encodeURIComponent(word)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Jisho API returned HTTP ${res.status}`);
@@ -43,6 +43,30 @@ async function findEntry(word, reading) {
   const { data } = await res.json();
   if (!data?.length) throw new Error(`No Jisho results for "${word}"`);
 
+  // Priority 1: slug from the .light-details_link /word/ href (search-page entries).
+  if (slug) {
+    const byLinkSlug = data.find(e => e.slug === slug);
+    if (byLinkSlug) return byLinkSlug;
+  }
+
+  // Priority 2: the word text displayed on the page equals an entry's slug.
+  // Handles word-page entries where .light-details_link doesn't point to /word/.
+  const byWordSlug = data.find(e => e.slug === word);
+  if (byWordSlug) return byWordSlug;
+
+  // Priority 3: meaning cross-check — any page .meaning-meaning text matches
+  // the joined english_definitions of a sense, or matches an individual item.
+  if (pageMeanings.length) {
+    const byMeaning = data.find(e =>
+      e.senses.some(s => {
+        const joined = s.english_definitions.join("; ");
+        return pageMeanings.some(m => m === joined || s.english_definitions.includes(m));
+      })
+    );
+    if (byMeaning) return byMeaning;
+  }
+
+  // Fallback: word+reading priority chain.
   return (
     data.find(e => e.japanese.some(j => j.word === word && j.reading === reading)) ??
     data.find(e => e.japanese.some(j => j.word === word)) ??
@@ -51,8 +75,8 @@ async function findEntry(word, reading) {
   );
 }
 
-async function fetchEntryData(word, reading) {
-  const entry = await findEntry(word, reading);
+async function fetchEntryData(word, reading, slug, pageMeanings) {
+  const entry = await findEntry(word, reading, slug, pageMeanings);
   const firstJapanese = entry.japanese[0] ?? {};
 
   const jlptTag = entry.jlpt?.[0] ?? "";
@@ -75,15 +99,15 @@ async function fetchEntryData(word, reading) {
   };
 }
 
-async function fetchSenses(word, reading) {
-  const entry = await findEntry(word, reading);
+async function fetchSenses(word, reading, slug, pageMeanings) {
+  const entry = await findEntry(word, reading, slug, pageMeanings);
   return entry.senses.filter(s => !s.parts_of_speech.includes("Wikipedia definition"));
 }
 
-async function addNote(word, reading, audioUrl, selectedDefinition) {
+async function addNote(word, reading, audioUrl, selectedDefinition, slug, pageMeanings) {
   const [{ deckName, modelName, fieldMappings }, entryData] = await Promise.all([
     getSettings(),
-    fetchEntryData(word, reading),
+    fetchEntryData(word, reading, slug, pageMeanings),
   ]);
 
   if (selectedDefinition !== undefined) {
@@ -144,16 +168,16 @@ async function checkNote(word, reading) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "FETCH_SENSES") {
-    const { word, reading } = message.payload;
-    fetchSenses(word, reading)
+    const { word, reading, slug, pageMeanings } = message.payload;
+    fetchSenses(word, reading, slug, pageMeanings)
       .then(senses => sendResponse({ senses }))
       .catch(err => sendResponse({ error: err.message }));
     return true;
   }
 
   if (message.type === "MINE_WORD") {
-    const { word, reading, audioUrl, selectedDefinition } = message.payload;
-    addNote(word, reading, audioUrl, selectedDefinition)
+    const { word, reading, audioUrl, selectedDefinition, slug, pageMeanings } = message.payload;
+    addNote(word, reading, audioUrl, selectedDefinition, slug, pageMeanings)
       .then(() => sendResponse({ success: true }))
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true;

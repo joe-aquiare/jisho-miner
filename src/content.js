@@ -34,12 +34,22 @@ function extractEntryData(entryEl) {
     reading = entryEl.querySelector(".furigana")?.textContent.trim().replace(/\s+/g, "") ?? "";
   }
 
-  return { word, reading, audioUrl };
+  // Extract slug from the "Details" link when it points to a /word/ page.
+  const detailsHref = entryEl.querySelector(".light-details_link")?.getAttribute("href") ?? "";
+  const slugEncoded = detailsHref.split("/word/")[1] ?? "";
+  const slug = slugEncoded ? decodeURIComponent(slugEncoded) : "";
+
+  // Collect all .meaning-meaning texts for cross-validating the API match.
+  const pageMeanings = [...entryEl.querySelectorAll(".meaning-meaning")]
+    .map(el => el.textContent.trim())
+    .filter(Boolean);
+
+  return { word, reading, audioUrl, slug, pageMeanings };
 }
 
 function markAsAdded(btn) {
   btn.textContent = "✓ In Deck";
-  btn.disabled = true;
+  //btn.disabled = true;
   btn.classList.add("jisho-miner-btn--added");
   btn.classList.remove("jisho-miner-btn--error");
 }
