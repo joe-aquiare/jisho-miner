@@ -7,29 +7,29 @@ const DEFAULTS = {
 };
 
 const JISHO_FIELDS = [
-  { value: "",              label: "(Empty)" },
-  { value: "__custom__",    label: "{Custom}" },
-  { value: "word",          label: "Word" },
-  { value: "reading",       label: "Kana" },
-  { value: "definition",    label: "Meaning" },
-  { value: "jlptLevel",     label: "JLPT Level" },
-  { value: "commonWord",    label: "Common Word" },
-  { value: "wanikaniLevel", label: "WaniKani Level" },
-  { value: "audio",         label: "Audio" },
-  { value: "webUrl",        label: "Web URL" },
-  { value: "apiUrl",        label: "API URL" },
-  { value: "partsOfSpeech", label: "Parts of Speech" },
-  { value: "tags",          label: "Tags" },
+  { internalName: "",               variableName: "",               labelName: "(Empty)"          },
+  { internalName: "__custom__",     variableName: "",               labelName: "{Custom}"         },
+  { internalName: "word",           variableName: "word",           labelName: "Word"             },
+  { internalName: "reading",        variableName: "kana",           labelName: "Kana"             },
+  { internalName: "definition",     variableName: "meaning",        labelName: "Meaning"          },
+  { internalName: "jlptLevel",      variableName: "jlptLevel",      labelName: "JLPT Level"       },
+  { internalName: "commonWord",     variableName: "commonWord",     labelName: "Common Word"      },
+  { internalName: "wanikaniLevel",  variableName: "wanikaniLevel",  labelName: "WaniKani Level"   },
+  { internalName: "audio",          variableName: "audio",          labelName: "Audio"            },
+  { internalName: "webUrl",         variableName: "webUrl",         labelName: "Web URL"          },
+  { internalName: "apiUrl",         variableName: "apiUrl",         labelName: "API URL"          },
+  { internalName: "partsOfSpeech",  variableName: "partsOfSpeech",  labelName: "Parts of Speech"  },
+  { internalName: "tags",           variableName: "tags",           labelName: "Tags"             },
 ];
 
-// Set of known stored values (everything except the UI-only "__custom__" sentinel).
+// Set of known internalNames.
 const KNOWN_JISHO_VALUES = new Set(
-  JISHO_FIELDS.filter(f => f.value !== "__custom__").map(f => f.value)
+  JISHO_FIELDS.filter(f => f.internalName !== "__custom__").map(f => f.internalName)
 );
 
 // Set of valid variable names usable inside {…} in a custom template.
 const VALID_JISHO_VARS = new Set(
-  JISHO_FIELDS.filter(f => f.value && f.value !== "__custom__").map(f => f.value)
+  JISHO_FIELDS.filter(f => f.variableName && f.internalName !== "__custom__").map(f => f.variableName)
 );
 
 async function ankiConnect(action, params = {}) {
@@ -110,10 +110,10 @@ function renderFieldMappings(noteFields, savedMappings) {
     const select = document.createElement("select");
     select.id = `field-map-${noteField}`;
     select.dataset.noteField = noteField;
-    for (const { value, label: optLabel } of JISHO_FIELDS) {
+    for (const { internalName, labelName } of JISHO_FIELDS) {
       const opt = document.createElement("option");
-      opt.value = value;
-      opt.textContent = optLabel;
+      opt.value = internalName;
+      opt.textContent = labelName;
       select.appendChild(opt);
     }
     select.value = isCustom ? "__custom__" : savedValue;
