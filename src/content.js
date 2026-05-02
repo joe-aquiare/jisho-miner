@@ -44,7 +44,7 @@ function markAsAdded(btn) {
   btn.classList.remove("jisho-miner-btn--error");
 }
 
-function showSenseModal(word, reading, senses) {
+function showSenseModal(word, senses) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "jisho-miner-overlay";
@@ -60,16 +60,9 @@ function showSenseModal(word, reading, senses) {
     wordEl.textContent = word;
     header.appendChild(wordEl);
 
-    if (reading && reading !== word) {
-      const readingEl = document.createElement("span");
-      readingEl.className = "jisho-miner-modal__reading";
-      readingEl.textContent = reading;
-      header.appendChild(readingEl);
-    }
-
     const titleEl = document.createElement("span");
     titleEl.className = "jisho-miner-modal__title";
-    titleEl.textContent = "Select meanings";
+    titleEl.textContent = "Select meaning(s):";
     header.appendChild(titleEl);
 
     const senseList = document.createElement("div");
@@ -185,7 +178,7 @@ function createMineButton(entryEl) {
       return;
     }
 
-    const selectedDefinition = await showSenseModal(data.word, data.reading, sensesResponse.senses);
+    const selectedDefinition = await showSenseModal(data.word, sensesResponse.senses);
 
     if (selectedDefinition === null) {
       btn.disabled = false;
