@@ -142,7 +142,7 @@ async function addNote(word, reading, audioUrl, selectedDefinition, slug, pageMe
       deckName,
       modelName,
       fields,
-      options: { allowDuplicate: false },
+      options: { allowDuplicate: true, duplicateScope: "deck" },
       tags: ["jisho-miner"],
     },
   });

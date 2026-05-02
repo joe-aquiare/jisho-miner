@@ -165,6 +165,13 @@ function createMineButton(entryEl) {
       .then(response => { if (response?.exists) markAsAdded(btn); });
   }
 
+  btn.addEventListener("mouseenter", () => {
+    if (btn.classList.contains("jisho-miner-btn--added")) btn.textContent = "+ Add Another?";
+  });
+  btn.addEventListener("mouseleave", () => {
+    if (btn.classList.contains("jisho-miner-btn--added")) btn.textContent = "✓ In Deck";
+  });
+
   btn.addEventListener("click", async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -172,7 +179,7 @@ function createMineButton(entryEl) {
     const data = extractEntryData(entryEl);
     if (!data.word) return;
 
-    btn.disabled = true;
+    //btn.disabled = true;
     btn.textContent = "…";
 
     const sensesResponse = await sendMessage({
