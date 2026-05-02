@@ -35,11 +35,7 @@ async function getSettings() {
   });
 }
 
-/**
- * Calls the Jisho API and returns a normalised data object for the entry
- * that best matches the given word and reading.
- */
-async function fetchEntryData(word, reading) {
+async function findEntry(word, reading) {
   const url = `${JISHO_API_URL}?keyword=${encodeURIComponent(word)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Jisho API returned HTTP ${res.status}`);
@@ -47,14 +43,16 @@ async function fetchEntryData(word, reading) {
   const { data } = await res.json();
   if (!data?.length) throw new Error(`No Jisho results for "${word}"`);
 
-  // Prefer an entry whose japanese variants match both word and reading,
-  // then word alone, then reading alone, then fall back to the first result.
-  const entry =
+  return (
     data.find(e => e.japanese.some(j => j.word === word && j.reading === reading)) ??
     data.find(e => e.japanese.some(j => j.word === word)) ??
     data.find(e => e.japanese.some(j => j.reading === word)) ??
-    data[0];
+    data[0]
+  );
+}
 
+async function fetchEntryData(word, reading) {
+  const entry = await findEntry(word, reading);
   const firstJapanese = entry.japanese[0] ?? {};
 
   const jlptTag = entry.jlpt?.[0] ?? "";
@@ -77,11 +75,20 @@ async function fetchEntryData(word, reading) {
   };
 }
 
-async function addNote(word, reading, audioUrl) {
+async function fetchSenses(word, reading) {
+  const entry = await findEntry(word, reading);
+  return entry.senses.filter(s => !s.parts_of_speech.includes("Wikipedia definition"));
+}
+
+async function addNote(word, reading, audioUrl, selectedDefinition) {
   const [{ deckName, modelName, fieldMappings }, entryData] = await Promise.all([
     getSettings(),
     fetchEntryData(word, reading),
   ]);
+
+  if (selectedDefinition !== undefined) {
+    entryData.definition = selectedDefinition;
+  }
 
   if (audioUrl && Object.values(fieldMappings).includes("audio")) {
     const filename = audioUrl.split("/").pop();
@@ -136,9 +143,17 @@ async function checkNote(word, reading) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === "FETCH_SENSES") {
+    const { word, reading } = message.payload;
+    fetchSenses(word, reading)
+      .then(senses => sendResponse({ senses }))
+      .catch(err => sendResponse({ error: err.message }));
+    return true;
+  }
+
   if (message.type === "MINE_WORD") {
-    const { word, reading, audioUrl } = message.payload;
-    addNote(word, reading, audioUrl)
+    const { word, reading, audioUrl, selectedDefinition } = message.payload;
+    addNote(word, reading, audioUrl, selectedDefinition)
       .then(() => sendResponse({ success: true }))
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true;

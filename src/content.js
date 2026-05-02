@@ -44,6 +44,111 @@ function markAsAdded(btn) {
   btn.classList.remove("jisho-miner-btn--error");
 }
 
+function showSenseModal(word, reading, senses) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "jisho-miner-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "jisho-miner-modal";
+
+    const header = document.createElement("div");
+    header.className = "jisho-miner-modal__header";
+
+    const wordEl = document.createElement("span");
+    wordEl.className = "jisho-miner-modal__word";
+    wordEl.textContent = word;
+    header.appendChild(wordEl);
+
+    if (reading && reading !== word) {
+      const readingEl = document.createElement("span");
+      readingEl.className = "jisho-miner-modal__reading";
+      readingEl.textContent = reading;
+      header.appendChild(readingEl);
+    }
+
+    const titleEl = document.createElement("span");
+    titleEl.className = "jisho-miner-modal__title";
+    titleEl.textContent = "Select meanings";
+    header.appendChild(titleEl);
+
+    const senseList = document.createElement("div");
+    senseList.className = "jisho-miner-modal__senses";
+
+    const checkboxes = [];
+    for (const sense of senses) {
+      const label = document.createElement("label");
+      label.className = "jisho-miner-modal__sense";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkboxes.push(checkbox);
+
+      const content = document.createElement("div");
+      content.className = "jisho-miner-modal__sense-content";
+
+      const pos = sense.parts_of_speech.join(", ");
+      if (pos) {
+        const posEl = document.createElement("div");
+        posEl.className = "jisho-miner-modal__pos";
+        posEl.textContent = pos;
+        content.appendChild(posEl);
+      }
+
+      const defEl = document.createElement("div");
+      defEl.className = "jisho-miner-modal__def";
+      defEl.textContent = sense.english_definitions.join("; ");
+      content.appendChild(defEl);
+
+      const meta = [...(sense.tags ?? []), ...(sense.info ?? [])].filter(Boolean).join(" · ");
+      if (meta) {
+        const metaEl = document.createElement("div");
+        metaEl.className = "jisho-miner-modal__meta";
+        metaEl.textContent = meta;
+        content.appendChild(metaEl);
+      }
+
+      label.appendChild(checkbox);
+      label.appendChild(content);
+      senseList.appendChild(label);
+    }
+
+    const footer = document.createElement("div");
+    footer.className = "jisho-miner-modal__footer";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "jisho-miner-modal__btn jisho-miner-modal__btn--cancel";
+    cancelBtn.textContent = "Cancel";
+
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "jisho-miner-modal__btn jisho-miner-modal__btn--add";
+    addBtn.textContent = "Add to Anki";
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(addBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(senseList);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    function close(result) {
+      overlay.remove();
+      resolve(result);
+    }
+
+    cancelBtn.addEventListener("click", () => close(null));
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) close(null); });
+    addBtn.addEventListener("click", () => {
+      const selected = senses.filter((_, i) => checkboxes[i].checked);
+      close(selected.map(s => s.english_definitions.join("; ")).join("; "));
+    });
+  });
+}
+
 function createMineButton(entryEl) {
   const btn = document.createElement("button");
   btn.className = MINE_BUTTON_CLASS;
@@ -67,7 +172,31 @@ function createMineButton(entryEl) {
     btn.disabled = true;
     btn.textContent = "…";
 
-    const response = await sendMessage({ type: "MINE_WORD", payload: data });
+    const sensesResponse = await sendMessage({
+      type: "FETCH_SENSES",
+      payload: { word: data.word, reading: data.reading },
+    });
+
+    if (!sensesResponse?.senses) {
+      btn.textContent = "Error";
+      btn.classList.add("jisho-miner-btn--error");
+      btn.title = sensesResponse?.error ?? "Failed to fetch meanings";
+      btn.disabled = false;
+      return;
+    }
+
+    const selectedDefinition = await showSenseModal(data.word, data.reading, sensesResponse.senses);
+
+    if (selectedDefinition === null) {
+      btn.disabled = false;
+      btn.textContent = "+ Add to Anki";
+      return;
+    }
+
+    const response = await sendMessage({
+      type: "MINE_WORD",
+      payload: { ...data, selectedDefinition },
+    });
 
     if (response?.success) {
       markAsAdded(btn);

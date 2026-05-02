@@ -38,3 +38,162 @@
   color: #000 !important;
   background-color: #e53935 !important;
 }
+
+.jisho-miner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.jisho-miner-modal {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  width: 320px;
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #eee;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.jisho-miner-modal__header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #444;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.jisho-miner-modal__word {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.jisho-miner-modal__reading {
+  font-size: 13px;
+  color: #9e9e9e;
+}
+
+.jisho-miner-modal__title {
+  font-size: 11px;
+  color: #9e9e9e;
+  margin-left: auto;
+}
+
+.jisho-miner-modal__senses {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 0;
+  scrollbar-color: #555 #2a2a2a;
+}
+
+.jisho-miner-modal__senses::-webkit-scrollbar {
+  width: 6px;
+}
+
+.jisho-miner-modal__senses::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.jisho-miner-modal__senses::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.jisho-miner-modal__sense {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.jisho-miner-modal__sense:hover {
+  background: #333;
+}
+
+.jisho-miner-modal__sense input[type="checkbox"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: #909dc0;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.jisho-miner-modal__sense-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jisho-miner-modal__pos {
+  font-size: 10px;
+  color: #9e9e9e;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.jisho-miner-modal__def {
+  font-size: 13px;
+  color: #eee;
+  line-height: 1.4;
+}
+
+.jisho-miner-modal__meta {
+  font-size: 10px;
+  color: #777;
+  font-style: italic;
+}
+
+.jisho-miner-modal__footer {
+  padding: 10px 16px 12px;
+  border-top: 1px solid #444;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.jisho-miner-modal__btn {
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  transition: background-color 0.15s ease;
+}
+
+.jisho-miner-modal__btn--cancel {
+  background: transparent;
+  color: #9e9e9e;
+  border: 1px solid #555;
+}
+
+.jisho-miner-modal__btn--cancel:hover {
+  background: #333;
+  color: #eee;
+  border-color: #777;
+}
+
+.jisho-miner-modal__btn--add {
+  background: #909dc0;
+  color: #222;
+  border: none;
+}
+
+.jisho-miner-modal__btn--add:hover {
+  background: #6e80af;
+}
