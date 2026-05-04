@@ -10,6 +10,9 @@
 - [Anki](https://apps.ankiweb.net/) desktop app running
 - [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki
 
+## Anki Preset(s)
+
+
 ## Variables
 
 | Name | Variable | Description |
@@ -34,5 +37,3 @@
 1. Go to `chrome://extensions/`
 2. Enable **Developer mode** (top-right toggle)
 3. Click **Load unpacked** and select this directory.
-
-# Formatting a card with 
