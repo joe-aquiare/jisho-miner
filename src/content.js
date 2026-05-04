@@ -1,15 +1,6 @@
-/**
- * Jisho Miner — content script
- *
- * Injects "Mine" buttons into Jisho.org word entries. On click, sends the
- * word and reading to the service worker, which looks them up via the Jisho
- * API and adds the resulting card to Anki via AnkiConnect.
- */
-
 const MINE_BUTTON_CLASS = "jisho-miner-btn";
 
-// Wraps chrome.runtime.sendMessage to handle the synchronous throw that
-// occurs when the extension is reloaded while the tab is still open.
+// Wraps chrome.runtime.sendMessage to handle the synchronous throw that occurs when the extension is reloaded while the tab is still open
 function sendMessage(message) {
   try {
     return chrome.runtime.sendMessage(message).catch(() => null);
@@ -23,9 +14,11 @@ function extractEntryData(entryEl) {
   const audioSrc = audioEl?.querySelector('source[type="audio/mpeg"]')?.getAttribute("src") ?? "";
   const audioUrl = audioSrc ? `https:${audioSrc}` : "";
 
-  // The audio id encodes word and reading as "audio_WORD:READING", which is
-  // more reliable than parsing furigana spans for mixed kana/kanji entries
-  // (the furigana span only carries readings for kanji, not kana prefixes).
+  /*  
+    The audio id encodes word and reading as "audio_WORD:READING", which is
+    more reliable than parsing furigana spans for mixed kana/kanji entries
+    the furigana span only carries readings for kanji, not kana prefixes) 
+  */
   let word, reading;
   if (audioEl?.id) {
     [word = "", reading = ""] = audioEl.id.slice("audio_".length).split(":");
@@ -34,12 +27,12 @@ function extractEntryData(entryEl) {
     reading = entryEl.querySelector(".furigana")?.textContent.trim().replace(/\s+/g, "") ?? "";
   }
 
-  // Extract slug from the "Details" link when it points to a /word/ page.
+  // Extract slug from the "Details" link when it points to a /word/ page
   const detailsHref = entryEl.querySelector(".light-details_link")?.getAttribute("href") ?? "";
   const slugEncoded = detailsHref.split("/word/")[1] ?? "";
   const slug = slugEncoded ? decodeURIComponent(slugEncoded) : "";
 
-  // Collect all .meaning-meaning texts for cross-validating the API match.
+  // Collect all .meaning-meaning texts for cross-validating the API match
   const pageMeanings = [...entryEl.querySelectorAll(".meaning-meaning")]
     .map(el => el.textContent.trim())
     .filter(Boolean);
@@ -47,6 +40,7 @@ function extractEntryData(entryEl) {
   return { word, reading, audioUrl, slug, pageMeanings };
 }
 
+// Marks a jisho miner button as added.
 function markAsAdded(btn) {
   btn.textContent = "✓ In Deck";
   //btn.disabled = true;
@@ -54,6 +48,7 @@ function markAsAdded(btn) {
   btn.classList.remove("jisho-miner-btn--error");
 }
 
+// Shows a popup allowing the user to select one or more meanings for a given word.
 function showSenseModal(word, senses) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
@@ -152,6 +147,37 @@ function showSenseModal(word, senses) {
   });
 }
 
+// Builds the "Word HTML" field, stripping the DOM contents of unecessary elements.
+function buildWordHtml(entryEl) {
+  const rep = entryEl.querySelector(".concept_light-representation");
+  if (!rep) return "";
+  const clone = rep.cloneNode(true);
+  clone.querySelectorAll(".jisho-miner-btn").forEach(el => el.remove());
+  return clone.outerHTML;
+}
+
+function buildConceptHtml(entryEl, selectedDefinition) {
+  const clone = entryEl.cloneNode(true);
+
+  clone.querySelectorAll(".concept_light-status_link, .jisho-miner-btn").forEach(el => el.remove());
+
+  clone.querySelectorAll(".meaning-meaning").forEach(el => {
+    if (selectedDefinition && !selectedDefinition.includes(el.innerHTML)) {
+      const wrapper = el.closest(".meaning-wrapper");
+      if (wrapper) {
+        const prev = wrapper.previousElementSibling;
+        if (prev?.classList.contains("meaning-tags")) prev.remove();
+        wrapper.remove();
+      } else {
+        el.remove();
+      }
+    }
+  });
+
+  return clone.outerHTML;
+}
+
+// Creates the mine button(s) on Jisho pages.
 function createMineButton(entryEl) {
   const btn = document.createElement("button");
   btn.className = MINE_BUTTON_CLASS;
@@ -203,9 +229,12 @@ function createMineButton(entryEl) {
       return;
     }
 
+    const conceptHtml = buildConceptHtml(entryEl, selectedDefinition);
+    const wordHtml = buildWordHtml(entryEl);
+
     const response = await sendMessage({
       type: "MINE_WORD",
-      payload: { ...data, selectedDefinition },
+      payload: { ...data, selectedDefinition, conceptHtml, wordHtml },
     });
 
     if (response?.success) {
@@ -221,6 +250,7 @@ function createMineButton(entryEl) {
   return btn;
 }
 
+// Injects buttons onto a Jisho page.
 function injectButtons(root = document) {
   root.querySelectorAll(".concept_light").forEach((entryEl) => {
     if (entryEl.querySelector(`.${MINE_BUTTON_CLASS}`)) return;

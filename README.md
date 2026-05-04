@@ -26,10 +26,13 @@
 | Tags | `{tags}` | Tags that are included for this entry. |
 | Audio | `{audio}` | The Anki-compatible audio field entry, if one exists. Audio files will be downloaded locally. |
 | Web URL | `{webUrl}` | The web client URL for the entry. |
-| API URL | `{waniKaniLevel}` | The API URL that returns all entries containing this word slug. |
+| API URL | `{apiURL}` | The API URL that returns all entries containing this word slug. |
+| HTML | `{html}` | The full, embedded HTML of the Jisho entry, filtered to the meaning(s) that were selected. |
 
 ## Running Locally
 
 1. Go to `chrome://extensions/`
 2. Enable **Developer mode** (top-right toggle)
-3. Click **Load unpacked** and select this directory
+3. Click **Load unpacked** and select this directory.
+
+# Formatting a card with 

@@ -1,25 +1,42 @@
 const ANKICONNECT_URL = "http://127.0.0.1:8765";
 
 const DEFAULTS = {
-  deckName: "Mining",
+  deckName: "Default",
   modelName: "Basic",
   fieldMappings: {},
 };
 
 const JISHO_FIELDS = [
+  // An empty field.
   { internalName: "",               variableName: "",               labelName: "(Empty)"          },
+  // Maps to a custom string to allow user-formatting, before the content is served to Anki.
   { internalName: "__custom__",     variableName: "",               labelName: "{Custom}"         },
+  // The Japanese word, referred to in Jisho as the "concept", or "slug".
   { internalName: "word",           variableName: "word",           labelName: "Word"             },
+  // The reading for the word in Kana only.
   { internalName: "reading",        variableName: "kana",           labelName: "Kana"             },
+  // The definition (or, definitions if multiple are selected) of the word.
   { internalName: "definition",     variableName: "meaning",        labelName: "Meaning"          },
+  // The JLPT level of the word, if one is provided.
   { internalName: "jlptLevel",      variableName: "jlptLevel",      labelName: "JLPT Level"       },
+  // Whether the word is common - yes or no.
   { internalName: "commonWord",     variableName: "commonWord",     labelName: "Common Word"      },
+  // The WaniKani level, if one is provided.
   { internalName: "wanikaniLevel",  variableName: "wanikaniLevel",  labelName: "WaniKani Level"   },
+  // The audio for the word, if it is provided.
   { internalName: "audio",          variableName: "audio",          labelName: "Audio"            },
+  // The web URL for this entry.
   { internalName: "webUrl",         variableName: "webUrl",         labelName: "Web URL"          },
+  // The API search URL containing this entry.
   { internalName: "apiUrl",         variableName: "apiUrl",         labelName: "API URL"          },
+  // The part(s) of speech for this word.
   { internalName: "partsOfSpeech",  variableName: "partsOfSpeech",  labelName: "Parts of Speech"  },
+  // Any tags this word contains.
   { internalName: "tags",           variableName: "tags",           labelName: "Tags"             },
+  // The HTML element(s) containing the entire served content from the Jisho listing.
+  { internalName: "html",           variableName: "html",           labelName: "HTML"             },
+  // The HTML element(s) containing just the word and its furigana/reading elements.
+  { internalName: "wordHtml",       variableName: "wordHtml",       labelName: "Word HTML"        },
 ];
 
 // Set of known internalNames.
@@ -32,6 +49,7 @@ const VALID_JISHO_VARS = new Set(
   JISHO_FIELDS.filter(f => f.variableName && f.internalName !== "__custom__").map(f => f.variableName)
 );
 
+// POSTs to Anki Connect.
 async function ankiConnect(action, params = {}) {
   const res = await fetch(ANKICONNECT_URL, {
     method: "POST",
@@ -44,10 +62,12 @@ async function ankiConnect(action, params = {}) {
   return result;
 }
 
+// Gets the settings stored in the web browser.
 function getSettings() {
   return new Promise((resolve) => chrome.storage.sync.get(DEFAULTS, resolve));
 }
 
+// Save settings to the browser.
 function saveSettings() {
   // Build noteField → custom template map from any visible custom inputs first.
   const customValues = {};
@@ -70,6 +90,7 @@ function saveSettings() {
   });
 }
 
+// Populates the selects/dropdowns.
 function populateSelect(selectEl, items, savedValue) {
   selectEl.innerHTML = "";
   for (const item of items) {
@@ -81,6 +102,7 @@ function populateSelect(selectEl, items, savedValue) {
   selectEl.value = items.includes(savedValue) ? savedValue : (items[0] ?? "");
 }
 
+// Checks whether the custom input the user provided was valid.
 function validateCustomInput(input, errorEl) {
   const matches = [...input.value.matchAll(/\{(\w+)\}/g)];
   const hasInvalid = matches.some(m => !VALID_JISHO_VARS.has(m[1]));
@@ -88,6 +110,7 @@ function validateCustomInput(input, errorEl) {
   errorEl.hidden = !hasInvalid;
 }
 
+// Renders mappings to all the field dropdowns for a given Anki note type.
 function renderFieldMappings(noteFields, savedMappings) {
   const container = document.getElementById("field-mappings");
   container.innerHTML = "";
@@ -154,11 +177,13 @@ function renderFieldMappings(noteFields, savedMappings) {
   }
 }
 
+// Loads the note type's fields from Anki.
 async function loadFields(modelName, savedMappings) {
   const noteFields = await ankiConnect("modelFieldNames", { modelName });
   renderFieldMappings(noteFields, savedMappings);
 }
 
+// Initializes the popup.
 async function init() {
   const settings = await getSettings();
 
