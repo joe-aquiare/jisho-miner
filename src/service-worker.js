@@ -1,15 +1,8 @@
-/**
- * Jisho Miner — service worker
- *
- * Receives MINE_WORD messages from the content script, looks up the word
- * via the Jisho public API to get authoritative field data, then adds the
- * card to Anki via the AnkiConnect HTTP API (http://127.0.0.1:8765).
- */
-
 const ANKICONNECT_URL = "http://127.0.0.1:8765";
 const ANKICONNECT_VERSION = 6;
 const JISHO_API_URL = "https://jisho.org/api/v1/search/words";
 
+// A request wrapper for Anki Connect.
 async function ankiConnectRequest(action, params = {}) {
   const response = await fetch(ANKICONNECT_URL, {
     method: "POST",
@@ -26,6 +19,7 @@ async function ankiConnectRequest(action, params = {}) {
   return body.result;
 }
 
+// Gets the stored chrome settings for this extension.
 async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(
@@ -35,11 +29,8 @@ async function getSettings() {
   });
 }
 
-/**
- * Calls the Jisho API and returns a normalised data object for the entry
- * that best matches the given word and reading.
- */
-async function fetchEntryData(word, reading) {
+// Finds an entry from the Jisho search API and filters it based on the search results.
+async function findEntry(word, reading, slug = "", pageMeanings = []) {
   const url = `${JISHO_API_URL}?keyword=${encodeURIComponent(word)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Jisho API returned HTTP ${res.status}`);
@@ -47,14 +38,41 @@ async function fetchEntryData(word, reading) {
   const { data } = await res.json();
   if (!data?.length) throw new Error(`No Jisho results for "${word}"`);
 
-  // Prefer an entry whose japanese variants match both word and reading,
-  // then word alone, then reading alone, then fall back to the first result.
-  const entry =
+  // 1: Filter slug from the .light-details_link /word/ href (search-page entries)
+  if (slug) {
+    const byLinkSlug = data.find(e => e.slug === slug);
+    if (byLinkSlug) return byLinkSlug;
+  }
+
+  // 2: Filter the word text displayed on the page equals an entry's slug.
+  // Handles word-page entries where .light-details_link doesn't point to /word/.
+  const byWordSlug = data.find(e => e.slug === word);
+  if (byWordSlug) return byWordSlug;
+
+  // 3: Filter meaning cross-check — any page .meaning-meaning text matches
+  // the joined english_definitions of a sense, or matches an individual item
+  if (pageMeanings.length) {
+    const byMeaning = data.find(e =>
+      e.senses.some(s => {
+        const joined = s.english_definitions.join("; ");
+        return pageMeanings.some(m => m === joined || s.english_definitions.includes(m));
+      })
+    );
+    if (byMeaning) return byMeaning;
+  }
+
+  // Fallback: word+reading priority chain
+  return (
     data.find(e => e.japanese.some(j => j.word === word && j.reading === reading)) ??
     data.find(e => e.japanese.some(j => j.word === word)) ??
     data.find(e => e.japanese.some(j => j.reading === word)) ??
-    data[0];
+    data[0]
+  );
+}
 
+// Fetches & aggregates all data for an entry to send to Anki.
+async function fetchEntryData(word, reading, slug, pageMeanings) {
+  const entry = await findEntry(word, reading, slug, pageMeanings);
   const firstJapanese = entry.japanese[0] ?? {};
 
   const jlptTag = entry.jlpt?.[0] ?? "";
@@ -77,11 +95,25 @@ async function fetchEntryData(word, reading) {
   };
 }
 
-async function addNote(word, reading, audioUrl) {
+// Fetches the "Senses" from the word's entry.
+async function fetchSenses(word, reading, slug, pageMeanings) {
+  const entry = await findEntry(word, reading, slug, pageMeanings);
+  return entry.senses.filter(s => !s.parts_of_speech.includes("Wikipedia definition"));
+}
+
+// Aggregates data for a note and adds it to Anki via. Anki connect.
+async function addNote(word, reading, audioUrl, selectedDefinition, slug, pageMeanings, conceptHtml, wordHtml) {
   const [{ deckName, modelName, fieldMappings }, entryData] = await Promise.all([
     getSettings(),
-    fetchEntryData(word, reading),
+    fetchEntryData(word, reading, slug, pageMeanings),
   ]);
+
+  if (selectedDefinition !== undefined) {
+    entryData.definition = selectedDefinition;
+  }
+
+  entryData.html = conceptHtml ?? "";
+  entryData.wordHtml = wordHtml ?? "";
 
   if (audioUrl && Object.values(fieldMappings).includes("audio")) {
     const filename = audioUrl.split("/").pop();
@@ -111,12 +143,13 @@ async function addNote(word, reading, audioUrl) {
       deckName,
       modelName,
       fields,
-      options: { allowDuplicate: false },
+      options: { allowDuplicate: true, duplicateScope: "deck" },
       tags: ["jisho-miner"],
     },
   });
 }
 
+// Checks to see if a note with a certain word or reading exists.
 async function checkNote(word, reading) {
   const { deckName, fieldMappings } = await getSettings();
 
@@ -136,9 +169,17 @@ async function checkNote(word, reading) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === "FETCH_SENSES") {
+    const { word, reading, slug, pageMeanings } = message.payload;
+    fetchSenses(word, reading, slug, pageMeanings)
+      .then(senses => sendResponse({ senses }))
+      .catch(err => sendResponse({ error: err.message }));
+    return true;
+  }
+
   if (message.type === "MINE_WORD") {
-    const { word, reading, audioUrl } = message.payload;
-    addNote(word, reading, audioUrl)
+    const { word, reading, audioUrl, selectedDefinition, slug, pageMeanings, conceptHtml, wordHtml } = message.payload;
+    addNote(word, reading, audioUrl, selectedDefinition, slug, pageMeanings, conceptHtml, wordHtml)
       .then(() => sendResponse({ success: true }))
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true;
