@@ -1,8 +1,8 @@
-![Alt text](/icons/bannerFull.png)
+![Alt text](/media/bannerFull.png)
 
 **Jisho Miner** is a Chromium browser extension that lets you add flashcards to an Anki mining deck directly from within Jisho. This will add a button beside every dictionary entry that creates a flashcard via. [AnkiConnect](https://ankiweb.net/shared/info/2055492159).
 
-![Alt text](/icons/example1.gif)
+![Alt text](/media/example1.gif)
 
 ## Requirements
 
