@@ -10,17 +10,27 @@
 - [Anki](https://apps.ankiweb.net/) desktop app running
 - [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki
 
-## Anki Preset(s)
+## Custom Anki Note Type
 
-Included with this exension (as a seperate download) is an Anki deck and note type that formats the scraped Jisho data in a pleasant way for an optimal studying experience. Features include:
+Along with this exension comes instructions for creating your own Anki note type that formats the scraped Jisho data in a pleasant way. Features include:
 
 - Automatic censorship of elements based on their card position
-- Identical presentation to that of Jisho.org via. CSS export(s)
-- An optional "Notes" section for appending additional information to the back of a note
+- Identical presentation to that of jisho.org via. CSS export(s)
+- An optional "Notes" section for appending additional information to the back of a card
 
 ![A preview of the note type.](/media/cardExample.png)
 
-## Variables
+Because this note type directly uses CSS sourced from Jisho.org, *I will not be hosting it here*.
+
+To set up your Anki note type, [follow these instructions](https://github.com/joe-aquiare/jisho-miner/tree/main/anki/note_types/jisho_miner_note).
+
+## Custom Fields
+
+Jisho Miner allows for field concatenation via. "Custom Fields", which allows you to combine Jisho values into a single string value to use for a note field.
+
+For example, selecting "{Custom}" for a note type and setting the text field to "{word} ({kana})" for 例えば will result in `例えば (たとえば)` for the given field.
+
+Use the table below as a guide to the variables that exist in Jisho Miner:
 
 | Name | Variable | Description |
 | -------- | -------- | -------- |
