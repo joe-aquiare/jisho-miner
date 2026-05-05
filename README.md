@@ -22,7 +22,7 @@ Along with this exension comes instructions for creating your own Anki note type
 
 Because this note type directly uses CSS sourced from Jisho.org, *I will not be hosting it here*.
 
-To set up your Anki note type, [follow these instructions](https://github.com/joe-aquiare/jisho-miner/tree/main/anki/note_types/jisho_miner_note).
+To set up your custom Anki note type, [follow these instructions](https://github.com/joe-aquiare/jisho-miner/tree/main/anki/note_types/jisho_miner_note).
 
 ## Custom Fields
 
