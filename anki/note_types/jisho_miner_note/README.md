@@ -1,6 +1,6 @@
 ## How to Build the Custom Note Type
 
-1. In Anki Desktop, go to Browse > Notes > Manage Note Types > And add a new Basic note type called "Jisho Miner Note", or name it whatever you like.
+1. In Anki Desktop, go to Browse > Notes > Manage Note Types, And add a new Basic note type called "Jisho Miner Note", or name it whatever you like.
 
 2. Select the note type and click "Fields". Delete the existing fields and create the following new fields:
 
@@ -23,11 +23,11 @@
 
 3. Create two card types for the note - one for English -> Japanese, and one for Japanese -> English.
 
-4. Copy the HTML for each card type into the Anki card editor. To open the card editor, go to Browse > Notes > Manage Note Types > Select your new note type > Cards.
+4. Copy the HTML for each card type into the Anki card editor. To open the card editor, go to Browse > Notes > Manage Note Types > (Select your new note type) > Cards.
 
 5. Go to Options > Rename Card Type... > And rename the default card type to "Japanese -> English", or whatever you like.
 
-6. Go to Options > Add Card Type... > Yes > And create a new card type called "English -> Japanese", or again, whatever you like.
+6. Go to Options > Add Card Type... > Yes, and create a new card type called "English -> Japanese", or again, whatever you like.
 
 7. From the subfolders in this directory, copy and paste the HTML for both the J->E and E->J card types to their respective locations.
 
