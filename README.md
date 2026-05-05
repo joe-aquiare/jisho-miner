@@ -8,7 +8,18 @@
 
 - Chromium-based browser (Chrome, Edge, Brave, Vivaldi, …)
 - [Anki](https://apps.ankiweb.net/) desktop app running
-- [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki
+- [Anki Connect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki
+
+## Setup
+
+1. Download the Jisho Miner plugin from the [releases](https://github.com/joe-aquiare/jisho-miner/releases) tab.
+2. Install the plugin to your browser.
+3. Click on the plugin icon with Anki open (and Anki Connect installed)
+4. Select your deck, note type, and populate the note's fields below.
+5. Click "Save".
+6. You're done! Enjoy mining on Jisho.
+
+Optional step(s): Follow the steps below to create a fancier note type that mimmics the visuals of the Jisho website.
 
 ## Custom Anki Note Type
 
