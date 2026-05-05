@@ -1,0 +1,40 @@
+<div id="cardFront">
+	<br/>
+	<br/>
+	<div id="cardType">English → 日本語</div>
+	<div id="jishoMinerStamp">Jisho Miner</div>
+	<div id="english">
+		<div id="meaningHtml">
+			{{HTML}}
+		</div>
+	</div>
+</div>
+
+<hr id=answer />
+
+<!------------------------------------------------------------------------------------------>
+<!----- Feel free to remove this block if you no longer want to see the center banner. ----->
+<div id="mined">
+	Mined from jisho.org with JishoMiner.
+	<div id="minedElaborate">
+		Dictionary entries and their web formatting are sourced directly.
+	</div>
+</div>
+<!------------------------------------------------------------------------------------------>
+
+<div id="cardBack">
+	<div id="japanese">
+		{{Word HTML}}
+		{{#Audio}}
+		<div id="audio">
+			{{Audio}}
+		</div>
+		{{/Audio}}
+	</div>
+	{{#Notes}}
+	<div id="notes">
+		<div id="notesTitle">Notes:</div>
+		{{Notes}}
+	</div>
+	{{/Notes}}
+</div>

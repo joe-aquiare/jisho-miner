@@ -1,0 +1,179 @@
+#cardFront {
+	min-height: 100px;
+	overflow: hidden;
+}
+
+#cardType {
+	font-size: .8em;
+	letter-spacing: .1em;
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	opacity: .3;
+}
+
+#jishoMinerStamp {
+	font-size: .8em;
+	letter-spacing: .1em;
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	opacity: .4;
+}
+
+#cardBack {
+	margin-top: 10vh;
+}
+
+#japanese {
+	margin-top: 2vh;
+	font-size: calc((6vh + 6vw) / 2);
+	text-align: center !important;
+	display: flex;
+  justify-content: center;
+  align-items: center;
+	overflow: hidden;
+}
+
+#japanese .kanji-2-up {
+	position: relative;
+	bottom: -.6em;
+}
+
+#answer {
+	opacity: 20%;
+	margin-bottom: 0px;
+}
+
+#audio {
+	margin-top: .4em;
+	margin-left: .2em;
+	opacity: .2;
+}
+
+#english * {
+	border: none;
+	text-align: left;
+}
+
+#mined {
+	text-align: center;
+	font-size: .6em;
+	background-color: rgba(0,0,0,.05);
+	color: #999;
+	margin-top: 0px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	letter-spacing: .15em;
+	display: flex;
+  align-items: center;
+	gap: .2em;
+	justify-content: center;
+}
+
+#mined a {
+	color: rgba(255,255,255,.13);	
+	text-decoration: none;
+	font-weight: 800;
+	letter-spacing: .04em;
+	margin-top: -2px;
+	margin-left: 3px;
+	margin-right: 2px;
+}
+
+#githubIcon {
+	margin-top: -3px;
+	margin-left: -2px;
+	margin-right: -3px;
+	height: 1.5em;
+	filter: invert(100%);
+	opacity: .2;
+	position: relative;
+	top: 3px;
+}
+
+#minedElaborate {
+	display: box;
+}
+
+#meaningHtml {
+	max-width: 650px !important;
+	margin: 0 auto;
+	margin-top: 4vh;
+}
+
+.censored .concept_light-readings {
+	color: transparent;
+	background-color: #222;
+	width: 100px;
+	user-select: none;
+}
+
+.censored .meaning-representation_notes {
+	color: transparent;
+	background-color: #222;
+	width: 100%;
+	user-select: none;
+}
+
+.censored .japanese {
+	color: transparent !important;
+	background-color: #222 !important;
+	user-select: none;
+}
+
+.concept_light-tag,
+.concept_light-tag a{
+	color: #222 !important;
+	text-align: center !important;
+}
+
+.censored .concept_light-tag {
+	display: none;
+}
+
+.concept_light-wrapper {
+	max-width: 160px;
+}
+
+#notes {
+	color: #999;
+	background-color: rgba(0,0,0,.05);
+	margin: 0 auto;
+	padding: 20px;
+	max-width: 650px;
+	border-radius: .2em;
+	font-weight: normal;
+	margin-top: 3em;
+}
+
+#notesTitle {
+	letter-spacing: .07em;
+	font-size: .75em;
+	margin-bottom: .7em;
+	opacity: .4;
+}
+
+@media (max-width: 650px) {
+	#minedElaborate {
+		display: none;
+	}
+}
+
+/************ jisho.org CSS ************/
+
+/* 
+  In order to populate the Jisho.org CSS, do the following:
+
+    - Open a modern web browser, and visit a jisho.org search link, e.g. https://jisho.org/search/test.
+    - Make sure you turn off any stylish CSS, custom CSS injections, or web browser extensions that impact the site's visual appearance.
+    - At the top of the page, make sure "Theme" is set to "Dark mode". Refresh the page.
+    - Open the developer tools drawer by pressing F12.
+    - Navigate to the Application tab > Frames > top > CSS
+      - As of 5/4/26, the top of the site's CSS starts with "meta.foundation-version", so if you found that, you're probably in the right place.
+    - Copy and paste all of that CSS below. It's about 12k lines - feel free to compact or optimize it if you like.
+
+  Note: There may be a few CSS errors, but that's ok - feel free to fix them if you want, but the site (and by extension, your note type) will function fine.
+
+  PASTE JISHO.ORG CSS HERE:
+*/
