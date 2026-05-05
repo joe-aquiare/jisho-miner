@@ -4,22 +4,22 @@ To construct your own Anki note type, do the following:
 
 1. populate a new note type with the following fields:
 
-| Field Name | Description |
-| --- | --- |
-| Word | The Japanese word, referred to in Jisho as the "concept", or "slug". |
-| Reading | The definition (or, definitions if multiple are selected) of the word. |
-| Definition | The definition (or, definitions if multiple are selected) of the word. |
-| JLPT Level | The JLPT level of the word, if one is provided. |
-| Common Word | Whether the word is common - yes or no. |
-| WaniKani Level | The WaniKani level, if one is provided. |
-| Audio | The audio for the word, if it is provided. |
-| Web URL | The web URL for this entry. |
-| API URL | The API search URL containing this entry. |
-| Parts of Speech | The part(s) of speech for this word. |
-| Tags | Any tags this word contains. |
-| HTML | The HTML element(s) containing the entire served content from the Jisho listing. |
-| Word HTML | The HTML element(s) containing just the word and its furigana/reading elements. |
-| Notes | User notes for the given word. |
+| Field Name |
+| --- |
+| Word |
+| Reading |
+| Definition |
+| JLPT Level |
+| Common Word |
+| WaniKani Level |
+| Audio |
+| Web URL |
+| API URL |
+| Parts of Speech |
+| Tags |
+| HTML |
+| Word HTML |
+| Notes |
 
 2. Create two card types for the note - one for English -> Japanese, and one for Japanese -> English.
 
