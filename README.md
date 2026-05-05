@@ -6,7 +6,7 @@
 
 ## Requirements
 
-- Chromium-based browser (Chrome, Edge, Brave, Vivaldi, …)
+- Chromium-based browser (Chrome, Edge, Brave, Vivaldi)
 - [Anki](https://apps.ankiweb.net/) desktop app running
 - [Anki Connect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki
 
