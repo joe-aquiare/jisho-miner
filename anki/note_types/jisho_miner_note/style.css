@@ -105,8 +105,10 @@
 .censored .concept_light-readings {
 	color: transparent;
 	background-color: #222;
-	width: 100px;
 	user-select: none;
+	font-size: 0px;
+	width: 100px;
+	height: 54px;
 }
 
 .censored .meaning-representation_notes {
@@ -116,10 +118,16 @@
 	user-select: none;
 }
 
-.censored .japanese {
+.censored .japanese,
+.censored .sense-tag,
+.censored .sense-tag a {
 	color: transparent !important;
 	background-color: #222 !important;
 	user-select: none;
+}
+
+.censored .concept_light-long_representation {
+	width: 25% !important;
 }
 
 .concept_light-tag,
